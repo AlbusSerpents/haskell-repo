@@ -9,9 +9,10 @@ import qualified Text.Regex.Posix ((=~))
 import Utils
 
 globToRegex :: String -> String
-globToRegex _ = ""
+globToRegex _ = undefined
 
-matchesRegex = ""
+matchesRegex :: String -> String -> Bool
+matchesRegex _ _ = undefined
 
 
 
