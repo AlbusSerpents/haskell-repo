@@ -26,3 +26,10 @@ globToRegexHelper ('[':_) = error "unterminated character class"
 
 globToRegexHelper (c:cs) = escape c ++ globToRegexHelper cs
 
+escape :: Char -> String
+escape character
+	| character `elem` escapeSymbols = '\\' : character : []
+	| otherwise = [character]
+	where escapeSymbols = "\\+()^%$.{}]|"
+
+charClass _ = undefined
