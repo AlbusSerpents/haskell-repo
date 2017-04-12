@@ -1,7 +1,8 @@
 module GlobRegex
 (
 	globToRegex,
-	matchesRegex
+	matchesRegex, 
+	unterminatedCharClassMessage
 )
 where 
 
@@ -22,7 +23,7 @@ globToRegexHelper ('?':cs) = "." ++ globToRegexHelper cs
 
 globToRegexHelper ('[':'!':c:cs) = "[^" ++ c : charClass cs
 globToRegexHelper ('[':c:cs) = "[" ++ c : charClass cs
-globToRegexHelper ('[':_) = error "unterminated character class"
+globToRegexHelper ('[':_) = error unterminatedCharClassMessage
 
 globToRegexHelper (c:cs) = escape c ++ globToRegexHelper cs
 
@@ -32,4 +33,9 @@ escape character
 	| otherwise = [character]
 	where escapeSymbols = "\\+()^%$.{}]|"
 
-charClass _ = undefined
+charClass :: String -> String
+charClass (']':cs) = ']' : globToRegexHelper cs
+charClass (c:cs) = c : charClass cs
+charClass [] = error unterminatedCharClassMessage
+
+unterminatedCharClassMessage = "unterminated character class"
