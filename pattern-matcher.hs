@@ -7,13 +7,20 @@ module GlobRegex
 where 
 
 import Text.Regex.Posix ((=~))
+import Data.Char (toUpper)
 import Utils
 
-globToRegex :: String -> String
-globToRegex cs = '^' : globToRegexHelper cs ++ "$"
+globToRegex :: String -> Bool -> String 
+globToRegex cs False = '^' : globToRegexHelper insensitive ++ "$"
+						where insensitive = map toUpper cs
+globToRegex cs True = '^' : globToRegexHelper cs ++ "$"
 
-matchesRegex :: String -> String -> Bool
-name `matchesRegex` pat = name =~ globToRegex pat
+matchesRegex :: String -> String -> Bool -> Bool
+matchesRegex src pat False = iSrc =~ (globToRegex iPat False)
+								where 
+									iSrc = map toUpper src
+									iPat = map toUpper pat
+matchesRegex src pat True = src =~ (globToRegex pat False)
 
 globToRegexHelper :: String -> String
 globToRegexHelper "" = ""
