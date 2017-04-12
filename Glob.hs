@@ -1,0 +1,7 @@
+module Glob
+(
+	namesMatching
+)
+
+where 
+
