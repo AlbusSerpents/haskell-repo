@@ -6,14 +6,14 @@ module GlobRegex
 )
 where 
 
-import qualified Text.Regex.Posix ((=~))
+import Text.Regex.Posix ((=~))
 import Utils
 
 globToRegex :: String -> String
 globToRegex cs = '^' : globToRegexHelper cs ++ "$"
 
 matchesRegex :: String -> String -> Bool
-matchesRegex _ _ = undefined
+name `matchesRegex` pat = name =~ globToRegex pat
 
 globToRegexHelper :: String -> String
 globToRegexHelper "" = ""
