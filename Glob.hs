@@ -26,22 +26,27 @@ namesMatching pattern
 				listMatches curDir baseName
 			(dirName, baseName) -> do
 				dirs <- if isPattern dirName
-						then namesMatching (dropTrailingPathSeparator dirName)
+						then namesMatching $ dropTrailingPathSeparator dirName
 						else return [dirName]
 				let listDir = if isPattern baseName
 							then listMatches
 							else listPlain
-				pathNames <- forM dirs $ \dir -> do
+				pathNames <- forM dirs $ (\dir -> do
 									baseNames <- listDir dir baseName
-									return (map (dir </>) baseNames)
+									return (map (dir </>) baseNames))
 				return (concat pathNames)
 
 isPattern :: String -> Bool
 isPattern text = any (\e -> e `elem` patternSymbols) text
-
 patternSymbols = "?[*"
 
-doesNameExist = undefined
+doesNameExist :: FilePath -> IO Bool
+doesNameExist path = do
+	file <- doesFileExist path 
+	if file then
+		return (True)
+	else
+		doesDirectoryExist path 
 
 listMatches = undefined
 
