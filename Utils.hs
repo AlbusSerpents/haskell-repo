@@ -1,6 +1,7 @@
 module Utils
 (
-	clear
+	clearLinux,
+	clearWindows
 )
 where
 {-# LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
@@ -9,4 +10,6 @@ import System.IO
 import System.Process
 import System.Random
 
-clear = system "cls"
+clearLinux = system "clear"
+
+clearWindows = system "cls"
