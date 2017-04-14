@@ -10,7 +10,7 @@ import System.Directory (doesDirectoryExist, doesFileExist,
 import System.FilePath (dropTrailingPathSeparator, 
 	splitFileName, (</>))
 import Utils
-import GlobRegex (matchesRegex, unterminatedCharClassMessage)
+import GlobRegex (matchesRegex, unterminatedCharClassMessage, matchesRegexCaseSencitive)
 import Control.Exception (handle)
 import Control.Monad (forM)
 
@@ -48,8 +48,23 @@ doesNameExist path = do
 	else
 		doesDirectoryExist path 
 
-listMatches :: FilePath -> FilePath -> IO [FilePath]
-listMatches = undefined
-
-listPlain :: FilePath -> FilePath -> IO [FilePath]
-listPlain = undefined
+listMatches :: FilePath -> String -> IO [FilePath]
+listMatches dir pattern = do
+	dirName <- if null dir
+				then getCurrentDirectory
+				else return (dir)
+	handle handleException  $ do
+		content <- getDirectoryContents dirName
+		let names = if isHidden pattern
+						then filter isHidden content
+						else filter (not . isHidden) content
+		return (filter (\e -> e `matchesRegexCaseSencitive` pattern) names)
+		
+handleException :: IOError -> IO [a]
+handleException e = (return [])
+		
+isHidden ('.':_) = True
+isHidden _ = False
+				
+listPlain :: FilePath -> String -> IO [FilePath]
+listPlain file pattern = undefined

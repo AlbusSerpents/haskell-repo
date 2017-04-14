@@ -2,7 +2,8 @@ module GlobRegex
 (
 	globToRegex,
 	matchesRegex, 
-	unterminatedCharClassMessage
+	unterminatedCharClassMessage,
+	matchesRegexCaseSencitive,
 )
 where 
 
@@ -14,6 +15,9 @@ globToRegex :: String -> Bool -> String
 globToRegex cs False = '^' : globToRegexHelper insensitive ++ "$"
 						where insensitive = map toUpper cs
 globToRegex cs True = '^' : globToRegexHelper cs ++ "$"
+
+matchesRegexCaseSencitive :: String -> String -> Bool
+matchesRegexCaseSencitive src pat = matchesRegex src pat True
 
 matchesRegex :: String -> String -> Bool -> Bool
 matchesRegex src pat False = iSrc =~ (globToRegex iPat False)
