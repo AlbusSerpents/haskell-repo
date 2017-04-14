@@ -48,6 +48,8 @@ doesNameExist path = do
 	else
 		doesDirectoryExist path 
 
+listMatches :: FilePath -> FilePath -> IO [FilePath]
 listMatches = undefined
 
+listPlain :: FilePath -> FilePath -> IO [FilePath]
 listPlain = undefined
