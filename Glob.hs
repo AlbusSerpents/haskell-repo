@@ -28,7 +28,7 @@ namesMatching pattern
 				dirs <- if isPattern dirName
 						then namesMatching $ dropTrailingPathSeparator dirName
 						else return [dirName]
-				let listDir = if isPattern baseName
+				let listDir = if isPattern baseName -- listDir is a function declaration
 							then listMatches
 							else listPlain
 				pathNames <- forM dirs $ (\dir -> do
@@ -38,7 +38,7 @@ namesMatching pattern
 
 isPattern :: String -> Bool
 isPattern text = any (\e -> e `elem` patternSymbols) text
-patternSymbols = "?[*"
+	where patternSymbols = "?[*"
 
 doesNameExist :: FilePath -> IO Bool
 doesNameExist path = do
@@ -61,10 +61,14 @@ listMatches dir pattern = do
 		return (filter (\e -> e `matchesRegexCaseSencitive` pattern) names)
 		
 handleException :: IOError -> IO [a]
-handleException e = (return [])
+handleException e = const (return []) e
 		
 isHidden ('.':_) = True
 isHidden _ = False
 				
 listPlain :: FilePath -> String -> IO [FilePath]
-listPlain file pattern = undefined
+listPlain dir baseName = do
+	exists <- if null baseName
+				then doesDirectoryExist dir
+				else doesNameExist (dir </> baseName)
+	return (if exists then [baseName] else [])
