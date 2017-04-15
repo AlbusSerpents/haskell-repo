@@ -20,6 +20,7 @@ namesMatching pattern
 	| not $ isPattern pattern = do
 		exists <- doesNameExist pattern
 		return (if exists then [pattern] else [])
+	| not. null $ fst $ findTwoStars pattern = undefined 
 	| otherwise = do
 		case splitFileName pattern of
 			("", baseName) -> do
@@ -79,3 +80,11 @@ listPlain dir baseName = do
 				then doesDirectoryExist dir
 				else doesNameExist (dir </> baseName)
 	return (if exists then [baseName] else [])
+
+findTwoStars :: String -> (String, String)
+findTwoStars s = findTwoStars' "" s
+
+findTwoStars' :: String -> String -> (String, String)
+findTwoStars' prev ('*':'*':rest) = (prev ++ "*", rest)
+findTwoStars' prev (c:cs) = findTwoStars' (prev ++ [c]) cs
+findTwoStars' prev [] = (prev, [])
