@@ -58,7 +58,7 @@ listMatches dir pattern = do
 		let names = if isHidden pattern
 						then filter isHidden content
 						else filter (not . isHidden) content
-		return (filter (\e -> e `matchesRegexCaseSencitive` pattern) names)
+		return (filter (\e -> matchesRegex e pattern False) names)
 		
 handleException :: IOError -> IO [a]
 handleException e = const (return []) e
