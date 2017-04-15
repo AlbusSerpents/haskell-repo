@@ -11,20 +11,18 @@ import Text.Regex.Posix ((=~))
 import Data.Char (toUpper)
 import Utils
 
-globToRegex :: String -> Bool -> String 
-globToRegex cs False = '^' : globToRegexHelper insensitive ++ "$"
-						where insensitive = map toUpper cs
-globToRegex cs True = '^' : globToRegexHelper cs ++ "$"
+globToRegex :: String -> String 
+globToRegex cs = '^' : globToRegexHelper cs ++ "$"
 
 matchesRegexCaseSencitive :: String -> String -> Bool
 matchesRegexCaseSencitive src pat = matchesRegex src pat True
 
 matchesRegex :: String -> String -> Bool -> Bool
-matchesRegex src pat False = iSrc =~ (globToRegex iPat False)
+matchesRegex src pat False = iSrc =~ (globToRegex iPat)
 								where 
 									iSrc = map toUpper src
 									iPat = map toUpper pat
-matchesRegex src pat True = src =~ (globToRegex pat False)
+matchesRegex src pat True = src =~ (globToRegex pat)
 
 globToRegexHelper :: String -> String
 globToRegexHelper "" = ""

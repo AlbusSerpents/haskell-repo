@@ -13,6 +13,7 @@ import Utils
 import GlobRegex (matchesRegex, unterminatedCharClassMessage, matchesRegexCaseSencitive)
 import Control.Exception (handle)
 import Control.Monad (forM)
+import System.FilePath (pathSeparator)
 
 namesMatching :: String -> IO [String]
 namesMatching pattern 
@@ -40,6 +41,12 @@ isPattern :: String -> Bool
 isPattern text = any (\e -> e `elem` patternSymbols) text
 	where patternSymbols = "?[*"
 
+getTypeSencitivity :: Bool
+getTypeSencitivity 
+	| pathSeparator == '\\' = False
+	| pathSeparator == '/' = True
+	| otherwise = error "Unknown Operation System" 
+
 doesNameExist :: FilePath -> IO Bool
 doesNameExist path = do
 	file <- doesFileExist path 
@@ -58,7 +65,7 @@ listMatches dir pattern = do
 		let names = if isHidden pattern
 						then filter isHidden content
 						else filter (not . isHidden) content
-		return (filter (\e -> matchesRegex e pattern False) names)
+		return (filter (\e -> matchesRegex e pattern $ getTypeSencitivity) names)
 		
 handleException :: IOError -> IO [a]
 handleException e = const (return []) e
