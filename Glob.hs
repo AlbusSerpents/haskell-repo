@@ -17,10 +17,12 @@ import System.FilePath (pathSeparator)
 
 namesMatching :: String -> IO [String]
 namesMatching pattern 
+        | findTwoStars pattern > 0 = do
+                let starSplit = splitAt (findTwoStars pattern) pattern
+                        in namesMatching $ fst starSplit
 	| not $ isPattern pattern = do
 		exists <- doesNameExist pattern
 		return (if exists then [pattern] else [])
-	| not. null $ fst $ findTwoStars pattern = undefined 
 	| otherwise = do
 		case splitFileName pattern of
 			("", baseName) -> do
@@ -81,10 +83,10 @@ listPlain dir baseName = do
 				else doesNameExist (dir </> baseName)
 	return (if exists then [baseName] else [])
 
-findTwoStars :: String -> (String, String)
-findTwoStars s = findTwoStars' "" s
+findTwoStars :: String -> Int
+findTwoStars s = findTwoStars' 0 s
 
-findTwoStars' :: String -> String -> (String, String)
-findTwoStars' prev ('*':'*':rest) = (prev ++ "*", rest)
-findTwoStars' prev (c:cs) = findTwoStars' (prev ++ [c]) cs
-findTwoStars' prev [] = (prev, [])
+findTwoStars' :: Int -> String -> Int
+findTwoStars' index ('*':'*':rest) = index + 1
+findTwoStars' index (c:cs) = findTwoStars' (index + 1) cs
+findTwoStars' index [] = -1
