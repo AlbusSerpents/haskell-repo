@@ -1,6 +1,6 @@
 module FileTree
 (
-        allChildFiles
+        getFullDirectoryContent
 )
 where 
 
@@ -10,32 +10,32 @@ import Control.Monad (forM, mapM)
 import System.Directory (getDirectoryContents)
 import Data.List (delete)
 
-data FileState = File | Directory
 
-allChildFiles :: FilePath ->  IO [FilePath]
-allChildFiles "./" = return ([])
-allChildFiles "../" = return ([])
-allChildFiles filePath = do 
+getFullDirectoryContent :: FilePath ->  IO [FilePath]
+getFullDirectoryContent "./" = return ([])
+getFullDirectoryContent "../" = return ([])
+getFullDirectoryContent filePath = do 
         results <- getLayer filePath
         execute results
         where 
                 execute (files, []) = do return (map (filePath </>) files)
                 execute (files, dirs) = do
-                                sub <- mapM allChildFiles dirs
+                                sub <- mapM getFullDirectoryContent dirs
                                 return ((map (filePath </>) files) ++ concat sub)  
-
-selfRelatingDirectories = [".",".."]
-
-isDir :: FilePath -> IO Bool
-isDir path = do
-        status <- getFileStatus path
-        return (isDirectory status)
 
 getLayer :: FilePath -> IO ([FilePath],[FilePath])
 getLayer path = do
         contents <- getDirectoryContents path
         marked <- forM (filter (\e -> e `notElem` selfRelatingDirectories) contents) (assignFileState path)
         return (foldr foldHelper ([],[]) marked)
+
+isDir :: FilePath -> IO Bool
+isDir path = do
+        status <- getFileStatus path
+        return (isDirectory status)
+
+data FileState = File | Directory
+selfRelatingDirectories = [".",".."]
 
 assignFileState :: FilePath -> FilePath -> IO (FilePath, FileState)
 assignFileState source path =  do

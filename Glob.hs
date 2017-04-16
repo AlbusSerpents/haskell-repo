@@ -11,6 +11,7 @@ import System.FilePath (dropTrailingPathSeparator,
 	splitFileName, (</>))
 import Utils
 import GlobRegex (matchesRegex, unterminatedCharClassMessage, matchesRegexCaseSencitive)
+import FileTree (getFullDirectoryContent)
 import Control.Exception (handle)
 import Control.Monad (forM)
 import System.FilePath (pathSeparator)
@@ -19,7 +20,7 @@ import Data.Maybe (isJust, fromJust)
 namesMatching :: String -> IO [String]
 namesMatching pattern 
         | isJust $ findTwoStars pattern  = do
-                putStrLn "This is the doule star case"
+                putStrLn ("This is the doule star case" ++ pattern)
                 let starSplit = splitAt (fromJust $ findTwoStars pattern) pattern
                        in namesMatching $ fst starSplit
 	| not $ isPattern pattern = do
