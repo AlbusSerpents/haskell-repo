@@ -14,12 +14,14 @@ import GlobRegex (matchesRegex, unterminatedCharClassMessage, matchesRegexCaseSe
 import Control.Exception (handle)
 import Control.Monad (forM)
 import System.FilePath (pathSeparator)
+import Data.Maybe (isJust, fromJust)
 
 namesMatching :: String -> IO [String]
 namesMatching pattern 
-        | findTwoStars pattern > 0 = do
-                let starSplit = splitAt (findTwoStars pattern) pattern
-                        in namesMatching $ fst starSplit
+        | isJust $ findTwoStars pattern  = do
+                putStrLn "This is the doule star case"
+                let starSplit = splitAt (fromJust $ findTwoStars pattern) pattern
+                       in namesMatching $ fst starSplit
 	| not $ isPattern pattern = do
 		exists <- doesNameExist pattern
 		return (if exists then [pattern] else [])
@@ -83,10 +85,11 @@ listPlain dir baseName = do
 				else doesNameExist (dir </> baseName)
 	return (if exists then [baseName] else [])
 
-findTwoStars :: String -> Int
+findTwoStars :: String -> Maybe Int
 findTwoStars s = findTwoStars' 0 s
 
-findTwoStars' :: Int -> String -> Int
-findTwoStars' index ('*':'*':rest) = index + 1
+findTwoStars' :: Int -> String -> Maybe Int
+findTwoStars' index [] = Nothing
+findTwoStars' index ('*':'*':rest) = Just (index + 1)
 findTwoStars' index (c:cs) = findTwoStars' (index + 1) cs
-findTwoStars' index [] = -1
+
