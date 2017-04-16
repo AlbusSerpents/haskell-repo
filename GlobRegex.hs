@@ -9,7 +9,6 @@ where
 
 import Text.Regex.Posix ((=~))
 import Data.Char (toUpper)
-import Utils
 
 globToRegex :: String -> String 
 globToRegex cs = '^' : globToRegexHelper cs ++ "$"
