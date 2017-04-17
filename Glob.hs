@@ -2,7 +2,6 @@ module Glob
 (
 	namesMatching
 )
-
 where 
 
 import System.Directory (doesDirectoryExist, doesFileExist,
@@ -11,11 +10,18 @@ import System.FilePath (dropTrailingPathSeparator,
 	splitFileName, (</>))
 import Utils
 import GlobRegex (matchesRegex, unterminatedCharClassMessage, matchesRegexCaseSencitive)
+import FileTree (getFullDirectoryContent)
 import Control.Exception (handle)
 import Control.Monad (forM)
+import System.FilePath (pathSeparator)
+import Data.Maybe (isJust, fromJust)
 
 namesMatching :: String -> IO [String]
 namesMatching pattern 
+        | isJust $ findTwoStars pattern  = do
+                putStrLn ("This is the doule star case" ++ pattern)
+                let starSplit = splitAt (fromJust $ findTwoStars pattern) pattern
+                       in namesMatching $ fst starSplit
 	| not $ isPattern pattern = do
 		exists <- doesNameExist pattern
 		return (if exists then [pattern] else [])
@@ -40,6 +46,12 @@ isPattern :: String -> Bool
 isPattern text = any (\e -> e `elem` patternSymbols) text
 	where patternSymbols = "?[*"
 
+getTypeSencitivity :: Bool
+getTypeSencitivity 
+	| pathSeparator == '\\' = False
+	| pathSeparator == '/' = True
+	| otherwise = error "Unknown Operation System" 
+
 doesNameExist :: FilePath -> IO Bool
 doesNameExist path = do
 	file <- doesFileExist path 
@@ -58,7 +70,7 @@ listMatches dir pattern = do
 		let names = if isHidden pattern
 						then filter isHidden content
 						else filter (not . isHidden) content
-		return (filter (\e -> e `matchesRegexCaseSencitive` pattern) names)
+		return (filter (\e -> matchesRegex e pattern $ getTypeSencitivity) names)
 		
 handleException :: IOError -> IO [a]
 handleException e = const (return []) e
@@ -72,3 +84,12 @@ listPlain dir baseName = do
 				then doesDirectoryExist dir
 				else doesNameExist (dir </> baseName)
 	return (if exists then [baseName] else [])
+
+findTwoStars :: String -> Maybe Int
+findTwoStars s = findTwoStars' 0 s
+
+findTwoStars' :: Int -> String -> Maybe Int
+findTwoStars' index [] = Nothing
+findTwoStars' index ('*':'*':rest) = Just (index + 1)
+findTwoStars' index (c:cs) = findTwoStars' (index + 1) cs
+
