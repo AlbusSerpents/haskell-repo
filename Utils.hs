@@ -1,7 +1,8 @@
 module Utils
 (
 	clear,
-        splitOn
+        splitOn,
+        deleteAll
 )
 where
 {-# LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
@@ -14,7 +15,7 @@ clear = system "clear"
 
 splitOn :: String -> String -> [String]
 splitOn src symbols = 
-                    splitHelper [] src
+                    deleteAll (splitHelper [] src) []
                      where
                         len = length symbols
 
@@ -25,5 +26,11 @@ splitOn src symbols =
                                         | length str < length symbols = splitHelper ((str++curr):ready) []
                                         | cut /= symbols = let lead = ((head str):curr)
                                                            in splitHelper (lead:ready) (tail str)
-                                        | cut == symbols = splitHelper (cut:(curr:ready)) (drop len str)
+                                        | cut == symbols = splitHelper ([]:(curr:ready)) (drop len str)
                                         where cut = take len str
+
+deleteAll :: (Eq a) => [a] -> a -> [a]
+deleteAll [] _ = []
+deleteAll (e:es) m 
+        | m == e = deleteAll es m
+        | otherwise = e : (deleteAll es m)
