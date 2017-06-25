@@ -18,10 +18,6 @@ import Data.Maybe (isJust, fromJust)
 
 namesMatching :: String -> IO [String]
 namesMatching pattern 
-        | isJust $ findTwoStars pattern  = do
-                putStrLn ("This is the doule star case" ++ pattern)
-                let starSplit = splitAt (fromJust $ findTwoStars pattern) pattern
-                       in namesMatching $ fst starSplit
 	| not $ isPattern pattern = do
 		exists <- doesNameExist pattern
 		return (if exists then [pattern] else [])
@@ -84,12 +80,4 @@ listPlain dir baseName = do
 				then doesDirectoryExist dir
 				else doesNameExist (dir </> baseName)
 	return (if exists then [baseName] else [])
-
-findTwoStars :: String -> Maybe Int
-findTwoStars s = findTwoStars' 0 s
-
-findTwoStars' :: Int -> String -> Maybe Int
-findTwoStars' index [] = Nothing
-findTwoStars' index ('*':'*':rest) = Just (index + 1)
-findTwoStars' index (c:cs) = findTwoStars' (index + 1) cs
 
