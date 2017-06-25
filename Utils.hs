@@ -2,7 +2,8 @@ module Utils
 (
         clear,
         splitOn,
-        deleteAll
+        deleteAll,
+        isDir
 )
 where
 {-# LANGUAGE TypeSynonymInstances, OverlappingInstances #-}
@@ -10,8 +11,14 @@ where
 import System.IO
 import System.Process
 import System.Random
+import System.Posix (getFileStatus, isDirectory)
 
 clear = system "clear"
+
+isDir :: FilePath -> IO Bool
+isDir path = do
+        status <- getFileStatus path
+        return (isDirectory status)
 
 splitOn :: String -> String -> [String]
 splitOn src symbols = 
@@ -34,4 +41,3 @@ deleteAll [] _ = []
 deleteAll (e:es) m 
         | m == e = deleteAll es m
         | otherwise = e : (deleteAll es m)
->>>>>>> 4001e92341959f2eeb78723f39edf12e67a6bc61
