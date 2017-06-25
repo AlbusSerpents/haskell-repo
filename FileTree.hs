@@ -5,11 +5,10 @@ module FileTree
 where 
 
 import System.FilePath ((</>), addTrailingPathSeparator)
-import System.Posix (getFileStatus, isDirectory)
 import Control.Monad (forM, mapM)
 import System.Directory (getDirectoryContents)
 import Data.List (delete)
-
+import Utils (isDir)
 
 getFullDirectoryContent :: FilePath ->  IO [FilePath]
 getFullDirectoryContent "./" = return ([])
@@ -28,11 +27,6 @@ getLayer path = do
         contents <- getDirectoryContents path
         marked <- forM (filter (\e -> e `notElem` selfRelatingDirectories) contents) (assignFileState path)
         return (foldr foldHelper ([],[]) marked)
-
-isDir :: FilePath -> IO Bool
-isDir path = do
-        status <- getFileStatus path
-        return (isDirectory status)
 
 data FileState = File | Directory
 selfRelatingDirectories = [".",".."]
