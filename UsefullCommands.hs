@@ -2,21 +2,29 @@ module UsefullCommands
 (
         delete,
         renameWith,
-        search,
         rename
 )
 where 
 
 import System.FilePath (replaceExtension)
-import System.Directory (doesFileExist, renameDirectory, renameFile)
+import System.Directory (doesFileExist, renameDirectory, renameFile, removeDirectoryRecursive, removeFile)
 import Glob (namesMatching)
 import Utils (clear, isDir)
 
 delete :: String -> IO()
-delete pattern = undefined
+delete pattern = do
+        files <- namesMatching pattern
+        deleteOneByOne files
 
-search :: String -> IO [String]
-search pattern = undefined
+deleteOneByOne :: [String] -> IO()
+deleteOneByOne [] = return ()
+deleteOneByOne (f:fs) = do
+                dir <- isDir f
+                if dir
+                        then removeDirectoryRecursive f
+                else
+                        removeFile f
+                deleteOneByOne fs
 
 renameWith :: (FilePath -> FilePath) -> FilePath -> IO FilePath
 renameWith func path = do 
