@@ -9,6 +9,9 @@ where
 
 import Text.Regex.Posix ((=~))
 import Data.Char (toUpper)
+import Data.Either
+
+type GlobError = String
 
 globToRegex :: String -> String 
 globToRegex cs = '^' : globToRegexHelper cs ++ "$"
@@ -17,10 +20,11 @@ matchesRegexCaseSencitive :: String -> String -> Bool
 matchesRegexCaseSencitive src pat = matchesRegex src pat True
 
 matchesRegex :: String -> String -> Bool -> Bool
-matchesRegex src pat False = iSrc =~ (globToRegex iPat)
-								where 
-									iSrc = map toUpper src
-									iPat = map toUpper pat
+matchesRegex src pat False = 
+                        iSrc =~ (globToRegex iPat)
+                                where 
+		                        iSrc = map toUpper src
+			                iPat = map toUpper pat
 matchesRegex src pat True = src =~ (globToRegex pat)
 
 globToRegexHelper :: String -> String
